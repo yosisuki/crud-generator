@@ -1,0 +1,11 @@
+package [packageName].rest.web.model.request;
+
+import com.tiket.tix.common.entity.CommonModel;
+import org.hibernate.validator.constraints.NotBlank;
+
+public class [className]Request extends CommonModel {
+
+  private static final long serialVersionUID = 1L;
+
+  [classContentsRequest]
+}

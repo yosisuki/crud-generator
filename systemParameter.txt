@@ -1,0 +1,3 @@
+String variable;
+String value;
+String description;

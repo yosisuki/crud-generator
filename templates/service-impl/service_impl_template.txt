@@ -1,0 +1,187 @@
+package [packageName].service.impl;
+
+import com.mongodb.WriteResult;
+import com.tiket.tix.common.rest.web.model.request.MandatoryRequest;
+import [packageName].dao.api.[className]Repository;
+import [packageName].entity.constant.enums.ResponseCode;
+import [packageName].entity.dao.[className];
+import [packageName].libraries.exception.BusinessLogicException;
+import [packageName].libraries.util.CacheKeyHelper;
+import [packageName].service.api.CacheService;
+import [packageName].service.api.[className]Service;
+import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+@Service
+public class [className]ServiceImpl implements [className]Service {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger([className]ServiceImpl.class);
+
+
+  @Autowired
+  private [className]Repository [classNameLowerFirst]Repository;
+
+  @Autowired
+  CacheService cacheService;
+
+  @Override
+  public Single<Page<[className]>> findAll[className]sByStoreId(
+      MandatoryRequest mandatoryRequest, Integer page, Integer size) {
+    return Single.<Page<[className]>>create(singleEmitter -> {
+      Pageable pageable = new PageRequest(page, size);
+      Page<[className]> [classNameLowerFirst]sPaginated = this.[classNameLowerFirst]Repository
+          .find[className]sByStoreIdAndIsDeleted(mandatoryRequest.getStoreId(), 0, pageable);
+
+      if ([classNameLowerFirst]sPaginated.getTotalElements() == 0) {
+        throw new BusinessLogicException(ResponseCode.DATA_NOT_EXIST.getCode(),
+            ResponseCode.DATA_NOT_EXIST.getMessage());
+      }
+
+      singleEmitter.onSuccess([classNameLowerFirst]sPaginated);
+    }).subscribeOn(Schedulers.io());
+  }
+
+  @Override
+  public Single<[className]> find[className]ById(MandatoryRequest mandatoryRequest,
+      String id) {
+    return Single.<[className]>create(singleEmitter -> {
+      String cacheKey = CacheKeyHelper.generate[className]Key(id);
+      [className] [classNameLowerFirst] = this.cacheService
+          .findCacheByKey(cacheKey, [className].class);
+
+      if (!isExist[className]([classNameLowerFirst])) {
+        [classNameLowerFirst] = this.[classNameLowerFirst]Repository
+            .find[className]ByIdAndIsDeleted(id, 0);
+
+        if (!isExist[className]([classNameLowerFirst])) {
+          throw new BusinessLogicException(ResponseCode.DATA_NOT_EXIST.getCode(),
+              ResponseCode.DATA_NOT_EXIST.getMessage());
+        }
+
+        this.cacheService.createCache(cacheKey, [classNameLowerFirst], 0);
+      }
+
+      singleEmitter.onSuccess([classNameLowerFirst]);
+    }).subscribeOn(Schedulers.io());
+  }
+  
+  private boolean isExist[className]([className] [classNameLowerFirst]) {
+    Boolean exist = true;
+
+    if ([classNameLowerFirst] == null) {
+      exist = false;
+    }
+
+    return exist;
+  }
+
+  @Override
+  public Single<[className]> create[className](MandatoryRequest mandatoryRequest,
+      [className] [classNameLowerFirst]) {
+    return Single.<[className]>create(singleEmitter -> {
+      [className] exist[className] = this.[classNameLowerFirst]Repository
+          .find[className]ByStoreIdAndVariableAndIsDeleted(mandatoryRequest.getStoreId(),
+              [classNameLowerFirst].getVariable(), 0);
+
+      if (isExist[className](exist[className])) {
+        throw new BusinessLogicException(ResponseCode.DUPLICATE_DATA.getCode(),
+            ResponseCode.DUPLICATE_DATA.getMessage());
+      }
+
+      [classNameLowerFirst].setStoreId(mandatoryRequest.getStoreId());
+      [classNameLowerFirst].setIsDeleted(0);
+      [classNameLowerFirst].setCreatedBy(mandatoryRequest.getUsername());
+      [classNameLowerFirst].setUpdatedBy(mandatoryRequest.getUsername());
+
+      [className] created[className] = this.[classNameLowerFirst]Repository.save([classNameLowerFirst]);
+
+      if (!isExist[className](created[className])) {
+        throw new BusinessLogicException(ResponseCode.DUPLICATE_DATA.getCode(),
+            ResponseCode.DUPLICATE_DATA.getMessage());
+      }
+
+      String cacheKey = CacheKeyHelper.generate[className]Key(created[className].getId());
+      this.cacheService.createCache(cacheKey, created[className], 0);
+
+      singleEmitter.onSuccess(created[className]);
+    }).subscribeOn(Schedulers.io());
+
+  }
+
+  @Override
+  public Single<[className]> update[className](MandatoryRequest mandatoryRequest,
+      [className] new[className], String id) {
+    return Single.<[className]>create(singleEmitter -> {
+      [className] exist[className] = this.[classNameLowerFirst]Repository
+          .find[className]ByIdAndIsDeleted(id, 0);
+
+      if (!isExist[className](exist[className])) {
+        throw new BusinessLogicException(ResponseCode.DATA_NOT_EXIST.getCode(),
+            ResponseCode.DATA_NOT_EXIST.getMessage());
+      }
+
+      this.checkDuplicate[className](mandatoryRequest.getStoreId(),
+          new[className].getVariable());
+
+      exist[className].setVariable(new[className].getVariable());
+      exist[className].setValue(new[className].getValue());
+      exist[className].setDescription(new[className].getDescription());
+      exist[className].setUpdatedBy(mandatoryRequest.getUsername());
+
+      [className] updated[className] = this.[classNameLowerFirst]Repository
+          .save(exist[className]);
+
+      String cacheKey = CacheKeyHelper.generate[className]Key(updated[className].getId());
+      this.cacheService.createCache(cacheKey, updated[className], 0);
+
+      singleEmitter.onSuccess(updated[className]);
+    }).subscribeOn(Schedulers.io());
+  }
+
+  private void checkDuplicate[className](String storeId, String variable) {
+    [className] duplicate[className] = this
+        .[classNameLowerFirst]Repository
+        .find[className]ByStoreIdAndVariableAndIsDeleted(storeId,
+            variable, 0);
+
+    if (isExist[className](duplicate[className])) {
+      throw new BusinessLogicException(ResponseCode.DUPLICATE_DATA.getCode(),
+          ResponseCode.DUPLICATE_DATA.getMessage());
+    }
+  }
+
+  @Override
+  public Single<Boolean> delete[className]ById(MandatoryRequest mandatoryRequest, String id) {
+    return Single.<Boolean>create(singleEmitter -> {
+      [className] [classNameLowerFirst] = this.[classNameLowerFirst]Repository
+          .find[className]ByIdAndIsDeleted(id, 0);
+
+      if (!isExist[className]([classNameLowerFirst])) {
+        throw new BusinessLogicException(ResponseCode.DATA_NOT_EXIST.getCode(),
+            ResponseCode.DATA_NOT_EXIST.getMessage());
+      }
+
+      WriteResult writeResult = this.[classNameLowerFirst]Repository
+          .update[className]IsDeleteById(mandatoryRequest, id, 1);
+
+      Boolean success = true;
+
+      if (writeResult.getN() == 0) {
+        success = false;
+      } else {
+        String cacheKey = CacheKeyHelper.generate[className]Key(id);
+        this.cacheService.deleteCache(cacheKey);
+      }
+
+      singleEmitter.onSuccess(success);
+    }).subscribeOn(Schedulers.io());
+  }
+
+}

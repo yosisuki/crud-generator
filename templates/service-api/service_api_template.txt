@@ -1,0 +1,23 @@
+package [packageName].service.api;
+
+import com.tiket.tix.common.rest.web.model.request.MandatoryRequest;
+import [packageName].entity.dao.[className];
+import io.reactivex.Single;
+import org.springframework.data.domain.Page;
+
+public interface [className]Service {
+
+  Single<Page<[className]>> findAll[className]sByStoreId(MandatoryRequest mandatoryRequest,
+      Integer page,
+      Integer size);
+
+  Single<[className]> find[className]ById(MandatoryRequest mandatoryRequest, String id);
+
+  Single<[className]> create[className](MandatoryRequest mandatoryRequest,
+      [className] systemParameter);
+
+  Single<[className]> update[className](MandatoryRequest mandatoryRequest,
+      [className] systemParameter, String id);
+
+  Single<Boolean> delete[className]ById(MandatoryRequest mandatoryRequest, String id);
+}

@@ -1,0 +1,5 @@
+package [packageName].entity.constant.fields;
+
+public class [className]Fields extends BaseMongoFields {
+    [fieldConstants]
+}

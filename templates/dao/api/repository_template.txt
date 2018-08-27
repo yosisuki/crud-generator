@@ -1,0 +1,14 @@
+package [packageName].dao.api;
+
+import com.tiket.tix.flight.core.entity.dao.SystemParameter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+public interface [className]Repository extends MongoRepository<[className], String> {
+
+  [className] find[className]ByStoreIdAndIdAndIsDeleted(String storeId, String id, Integer isDeleted);
+
+  Page<[className]> find[className]sByStoreIdAndIsDeleted(String storeId, Integer isDeleted,
+      Pageable pageable);
+}

@@ -1,0 +1,12 @@
+package [packageName].rest.web.model.response;
+
+import com.tiket.tix.common.entity.CommonModel;
+import net.karneim.pojobuilder.GeneratePojoBuilder;
+
+@GeneratePojoBuilder
+public class [className]Response extends CommonModel {
+
+  private static final long serialVersionUID = 1L;
+
+  [classContentsResponse]
+}
