@@ -8,7 +8,7 @@ import (
 )
 
 func main(){
-	b, err := ioutil.ReadFile("systemParameter.txt") // just pass the file name
+	b, err := ioutil.ReadFile("dataDiri.txt") // just pass the file name
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -17,11 +17,11 @@ func main(){
 
 	stringsArray := strings.Split(str,"\n")
 
-	className := "SystemParameter"
-	packageName := "com.tiket.tix.flight.core"
-	classNameLowerFirst := "systemParameter"
-	classNameTitle := "System Parameter"
-	classNameConstant := "SYSTEM_PARAMETER"
+	className := "DataDiri"
+	packageName := "com.tiket.tix.flight.search"
+	classNameLowerFirst := "dataDiri"
+	classNameTitle := "Data Diri"
+	classNameConstant := "DATA_DIRI"
 
 
 	generators.GenerateRepository(className, packageName)

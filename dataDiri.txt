@@ -1,0 +1,3 @@
+String nama
+String noTelp
+String email
