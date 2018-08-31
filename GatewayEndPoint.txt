@@ -1,0 +1,5 @@
+String slug
+String url
+String action
+String privilegeId
+String groupName

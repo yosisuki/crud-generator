@@ -21,7 +21,7 @@ func GenerateResponse(className string, packageName string, stringsArray []strin
 
 	for _, value := range stringsArray {
 		classContentsResponse += "@NotNull\n"
-		classContentsResponse += "private " + value + "\n"
+		classContentsResponse += "private " + value + ";\n"
 		valuesArray := strings.Split(value, " ")
 		classContentsResponse += "public void set" + helpers.UcFirst(valuesArray[1]) + "() {this."+valuesArray[1]+" = "+valuesArray[1]+";} \n"
 		classContentsResponse += "public "+valuesArray[0]+" get" + helpers.UcFirst(valuesArray[1]) + "() {return "+valuesArray[1]+";} \n\n"
@@ -48,7 +48,7 @@ func GenerateRequest(className string, packageName string, stringsArray []string
 
 	for _, value := range stringsArray {
 		classContentsRequest += "@NotNull\n"
-		classContentsRequest += "private " +value + "\n"
+		classContentsRequest += "private " +value + ";\n"
 		valuesArray := strings.Split(value, " ")
 		classContentsRequest += "public void set" + helpers.UcFirst(valuesArray[1]) + "() {this."+valuesArray[1]+" = "+valuesArray[1]+";} \n"
 		classContentsRequest += "public "+valuesArray[0]+" get" + helpers.UcFirst(valuesArray[1]) + "() {return "+valuesArray[1]+";} \n\n"

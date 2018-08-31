@@ -8,7 +8,7 @@ import (
 )
 
 func main(){
-	b, err := ioutil.ReadFile("dataDiri.txt") // just pass the file name
+	b, err := ioutil.ReadFile("GatewayEndPoint.txt") // just pass the file name
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -17,11 +17,11 @@ func main(){
 
 	stringsArray := strings.Split(str,"\n")
 
-	className := "DataDiri"
+	className := "GatewayEndPoint"
 	packageName := "com.tiket.tix.flight.search"
-	classNameLowerFirst := "dataDiri"
-	classNameTitle := "Data Diri"
-	classNameConstant := "DATA_DIRI"
+	classNameLowerFirst := "gatewayEndPoint"
+	classNameTitle := "Gateway EndPoint"
+	classNameConstant := "GATEWAY_ENDPOINT"
 
 
 	generators.GenerateRepository(className, packageName)
@@ -31,5 +31,4 @@ func main(){
 	generators.GenerateServiceImpl(className, packageName, classNameLowerFirst)
 	generators.GenerateRequest(className, packageName, stringsArray)
 	generators.GenerateResponse(className, packageName, stringsArray)
-
 }
