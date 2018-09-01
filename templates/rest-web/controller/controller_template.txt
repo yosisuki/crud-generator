@@ -29,7 +29,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
-@RequestMapping(ApiPath.[classNameConstant])
+@RequestMapping("[classNameLowerFirst]")
 @Api(value = "[classNameTitle]")
 public class [className]Controller {
 
@@ -98,28 +98,6 @@ public class [className]Controller {
 
     this.[classNameLowerFirst]Service
         .create[className](mandatoryRequest, this.to[className]([classNameLowerFirst]Request))
-        .map(this::to[className]Response)
-        .map([classNameLowerFirst]Response -> CommonResponse
-            .constructResponse(ResponseCode.SUCCESS.getCode(), ResponseCode.SUCCESS.getMessage(),
-                null, [classNameLowerFirst]Response))
-        .subscribe(deferred::setResult, deferred::setErrorResult);
-
-    return deferred;
-  }
-
-  @RequestMapping(path = ApiPath.ID, method = RequestMethod.PUT)
-  public DeferredResult<BaseResponse<[className]Response>> update[className](
-      @PathVariable("id") String id,
-      @ApiIgnore @Valid @ModelAttribute MandatoryRequest mandatoryRequest,
-      @RequestBody [className]Request [classNameLowerFirst]Request) {
-    LOGGER.info(
-        "update[className] Request mandatoryRequest = {}, [classNameLowerFirst]Request = {}, id = {}",
-        mandatoryRequest, [classNameLowerFirst]Request, id);
-
-    DeferredResult<BaseResponse<[className]Response>> deferred = new DeferredResult<>();
-
-    this.[classNameLowerFirst]Service
-        .update[className](mandatoryRequest, this.to[className]([classNameLowerFirst]Request), id)
         .map(this::to[className]Response)
         .map([classNameLowerFirst]Response -> CommonResponse
             .constructResponse(ResponseCode.SUCCESS.getCode(), ResponseCode.SUCCESS.getMessage(),

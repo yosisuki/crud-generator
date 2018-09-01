@@ -1,6 +1,6 @@
 package [packageName].dao.api;
 
-import com.tiket.tix.flight.core.entity.dao.SystemParameter;
+import [packageName].entity.dao.[className];
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;

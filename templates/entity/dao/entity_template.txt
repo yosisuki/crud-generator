@@ -1,0 +1,13 @@
+package [packageName].entity.dao;
+
+import com.tiket.tix.gateway.dashboard.entity.constant.fields.[className]Fields;
+import com.tiket.tix.gateway.dashboard.entity.dao.common.BaseMongo;
+import net.karneim.pojobuilder.GeneratePojoBuilder;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+@GeneratePojoBuilder
+@Document(collection = "[classNameConstant]")
+public class [className] extends BaseMongo {
+  [classContentsEntity]
+}

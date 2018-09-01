@@ -22,7 +22,7 @@ func GenerateFieldsConstant(className string, packageName string, stringsArray [
 	for _, value := range stringsArray {
 		fieldConstants += "public static final String "
 		valuesArray := strings.Split(value, " ")
-		fieldConstants += strings.ToUpper(helpers.ToSnakeCase(valuesArray[1])) + "; \n"
+		fieldConstants += strings.ToUpper(helpers.ToSnakeCase(valuesArray[1])) + " = \""+valuesArray[1]+"\"; \n"
 	}
 
 	output = strings.Replace(output, "[fieldConstants]", fieldConstants, -1)

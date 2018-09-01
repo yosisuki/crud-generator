@@ -16,8 +16,5 @@ public interface [className]Service {
   Single<[className]> create[className](MandatoryRequest mandatoryRequest,
       [className] systemParameter);
 
-  Single<[className]> update[className](MandatoryRequest mandatoryRequest,
-      [className] systemParameter, String id);
-
   Single<Boolean> delete[className]ById(MandatoryRequest mandatoryRequest, String id);
 }

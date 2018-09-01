@@ -6,11 +6,12 @@ import [packageName].dao.api.[className]Repository;
 import [packageName].entity.constant.enums.ResponseCode;
 import [packageName].entity.dao.[className];
 import [packageName].libraries.exception.BusinessLogicException;
-import [packageName].libraries.util.CacheKeyHelper;
 import [packageName].service.api.CacheService;
 import [packageName].service.api.[className]Service;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,13 +53,13 @@ public class [className]ServiceImpl implements [className]Service {
   public Single<[className]> find[className]ById(MandatoryRequest mandatoryRequest,
       String id) {
     return Single.<[className]>create(singleEmitter -> {
-      String cacheKey = CacheKeyHelper.generate[className]Key(id);
+      String cacheKey = generate[className]Key(mandatoryRequest.getStoreId(), id);
       [className] [classNameLowerFirst] = this.cacheService
           .findCacheByKey(cacheKey, [className].class);
 
       if (!isExist[className]([classNameLowerFirst])) {
         [classNameLowerFirst] = this.[classNameLowerFirst]Repository
-            .find[className]ByIdAndIsDeleted(id, 0);
+            .find[className]ByStoreIdAndIdAndIsDeleted(mandatoryRequest.getStoreId(), id, 0);
 
         if (!isExist[className]([classNameLowerFirst])) {
           throw new BusinessLogicException(ResponseCode.DATA_NOT_EXIST.getCode(),
@@ -71,7 +72,11 @@ public class [className]ServiceImpl implements [className]Service {
       singleEmitter.onSuccess([classNameLowerFirst]);
     }).subscribeOn(Schedulers.io());
   }
-  
+
+  private String generate[className]Key(String storeId, String id) {
+    return "[packageName].[className]." + storeId + id;
+  }
+
   private boolean isExist[className]([className] [classNameLowerFirst]) {
     Boolean exist = true;
 
@@ -87,8 +92,8 @@ public class [className]ServiceImpl implements [className]Service {
       [className] [classNameLowerFirst]) {
     return Single.<[className]>create(singleEmitter -> {
       [className] exist[className] = this.[classNameLowerFirst]Repository
-          .find[className]ByStoreIdAndVariableAndIsDeleted(mandatoryRequest.getStoreId(),
-              [classNameLowerFirst].getVariable(), 0);
+          .find[className]ByStoreIdAndIdAndIsDeleted(mandatoryRequest.getStoreId(),
+              [classNameLowerFirst].getId(), 0);
 
       if (isExist[className](exist[className])) {
         throw new BusinessLogicException(ResponseCode.DUPLICATE_DATA.getCode(),
@@ -107,7 +112,8 @@ public class [className]ServiceImpl implements [className]Service {
             ResponseCode.DUPLICATE_DATA.getMessage());
       }
 
-      String cacheKey = CacheKeyHelper.generate[className]Key(created[className].getId());
+      String cacheKey = generate[className]Key(mandatoryRequest
+          .getStoreId(), created[className].getId());
       this.cacheService.createCache(cacheKey, created[className], 0);
 
       singleEmitter.onSuccess(created[className]);
@@ -116,71 +122,23 @@ public class [className]ServiceImpl implements [className]Service {
   }
 
   @Override
-  public Single<[className]> update[className](MandatoryRequest mandatoryRequest,
-      [className] new[className], String id) {
-    return Single.<[className]>create(singleEmitter -> {
-      [className] exist[className] = this.[classNameLowerFirst]Repository
-          .find[className]ByIdAndIsDeleted(id, 0);
-
-      if (!isExist[className](exist[className])) {
-        throw new BusinessLogicException(ResponseCode.DATA_NOT_EXIST.getCode(),
-            ResponseCode.DATA_NOT_EXIST.getMessage());
-      }
-
-      this.checkDuplicate[className](mandatoryRequest.getStoreId(),
-          new[className].getVariable());
-
-      exist[className].setVariable(new[className].getVariable());
-      exist[className].setValue(new[className].getValue());
-      exist[className].setDescription(new[className].getDescription());
-      exist[className].setUpdatedBy(mandatoryRequest.getUsername());
-
-      [className] updated[className] = this.[classNameLowerFirst]Repository
-          .save(exist[className]);
-
-      String cacheKey = CacheKeyHelper.generate[className]Key(updated[className].getId());
-      this.cacheService.createCache(cacheKey, updated[className], 0);
-
-      singleEmitter.onSuccess(updated[className]);
-    }).subscribeOn(Schedulers.io());
-  }
-
-  private void checkDuplicate[className](String storeId, String variable) {
-    [className] duplicate[className] = this
-        .[classNameLowerFirst]Repository
-        .find[className]ByStoreIdAndVariableAndIsDeleted(storeId,
-            variable, 0);
-
-    if (isExist[className](duplicate[className])) {
-      throw new BusinessLogicException(ResponseCode.DUPLICATE_DATA.getCode(),
-          ResponseCode.DUPLICATE_DATA.getMessage());
-    }
-  }
-
-  @Override
   public Single<Boolean> delete[className]ById(MandatoryRequest mandatoryRequest, String id) {
     return Single.<Boolean>create(singleEmitter -> {
       [className] [classNameLowerFirst] = this.[classNameLowerFirst]Repository
-          .find[className]ByIdAndIsDeleted(id, 0);
+          .find[className]ByStoreIdAndIdAndIsDeleted(mandatoryRequest.getStoreId(), id, 0);
 
       if (!isExist[className]([classNameLowerFirst])) {
         throw new BusinessLogicException(ResponseCode.DATA_NOT_EXIST.getCode(),
             ResponseCode.DATA_NOT_EXIST.getMessage());
       }
 
-      WriteResult writeResult = this.[classNameLowerFirst]Repository
-          .update[className]IsDeleteById(mandatoryRequest, id, 1);
+      [classNameLowerFirst].setIsDeleted(1);
+      [classNameLowerFirst]Repository.save([classNameLowerFirst]);
 
-      Boolean success = true;
+      String cacheKey = generate[className]Key(mandatoryRequest.getStoreId(), id);
+      this.cacheService.deleteCache(cacheKey);
 
-      if (writeResult.getN() == 0) {
-        success = false;
-      } else {
-        String cacheKey = CacheKeyHelper.generate[className]Key(id);
-        this.cacheService.deleteCache(cacheKey);
-      }
-
-      singleEmitter.onSuccess(success);
+      singleEmitter.onSuccess(true);
     }).subscribeOn(Schedulers.io());
   }
 
